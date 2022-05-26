@@ -2,6 +2,9 @@
 <script src="https://unpkg.com/blip-chat-widget" type="text/javascript">
 </script>
 <main>
+    <body>
+    
+    </body>
     
 <script>
     (function () {
