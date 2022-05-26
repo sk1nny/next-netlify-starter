@@ -8,16 +8,7 @@ export default function Home() {
       <Head>
         <title>Next.js Starter!</title>
         <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <Header title="Welcome to my app!" />
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-    
-      </main>
-    <script src="https://unpkg.com/blip-chat-widget" type="text/javascript">
+       <script src="https://unpkg.com/blip-chat-widget" type="text/javascript">
 </script>
 <script>
     (function () {
@@ -30,6 +21,17 @@ export default function Home() {
         }
     })();
 </script>
+      </Head>
+    
+
+      <main>
+        <Header title="Welcome to my app!" />
+        <p className="description">
+          Get started by editing <code>pages/index.js</code>
+        </p>
+    
+      </main>
+ 
                                 
 
       <Footer />
