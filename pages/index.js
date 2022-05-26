@@ -1,44 +1,275 @@
-import Head from 'next/head'
-import Header from '@components/Header'
-import Footer from '@components/Footer'
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>BlipChat widget</title>
+  </head>
 
-export default function Home() {
-  return (
-    <div className="container">
-      <Head>
-        <title>Next.js Starter!</title>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="icon" href="/https://yago-luiz-hillesheim-81lzw.chat.blip.ai/?appKey=dHJhbnNib3JkbzQ1cGVnd3RzcWF5dWhqOXduYm06MWVlODhiNmUtMThlYS00ODlmLWI4MWYtMmI5ZWJhN2UxZjlk" />
-   
-      </Head>
-    
+  <body>
+    <script
+      src="https://unpkg.com/blip-chat-widget@1.5.2"
+      type="text/javascript"
+    ></script>
+    <div class="container">
+      <div class="column">
+        <div class="row">
+          <h1>BlipChat Sandbox</h1>
+          <p>Set your environment and app key</p>
 
-      <main>
-        <Header title="Welcome to my app!" />
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-    
-      </main>
- <body>
-    <h1> teste </h1>
-    <script src="https://unpkg.com/blip-chat-widget" type="text/javascript"></script>
+          <label for="app-key">App Key:</label>
+          <input type="text" id="app-key" name="app-key" />
 
-<script>
-    (function () {
-        window.onload = function () {
-            new BlipChat()
-            .withAppKey('dHJhbnNib3JkbzQ1cGVnd3RzcWF5dWhqOXduYm06MWVlODhiNmUtMThlYS00ODlmLWI4MWYtMmI5ZWJhN2UxZjlk')
-            .withButton({"color":"#2CC3D5","icon":"https://blipmediastore.blob.core.windows.net/public-medias/Media_214b44af-a72b-4736-939e-3cf8c62e4332"})
-            .withCustomCommonUrl('https://yago-luiz-hillesheim-81lzw.chat.blip.ai/')
-            .build();
-        }
-    })();
-</script>
-                                
-                                
+          <label for="environment">Environment:</label>
+          <input
+            type="text"
+            id="environment"
+            name="environment"
+            value="production"
+          />
 
-      <Footer />
+          <p>Use buttons bellow to see different behaviours of BLiP Chat</p>
+
+          <button onclick="buildChat({authType:BlipChat.GUEST_AUTH})">
+            Build SDK as GUEST (Default)
+          </button>
+          <button onclick="buildChat({authType:BlipChat.DEV_AUTH})">
+            Build SDK as DEV
+          </button>
+          <button onclick="changeSDK()">Change SDK Template</button>
+          <button onclick="toogleChat()">Toogle open chat</button>
+          <button onclick="destroyChat()">Destroy SDK</button>
+        </div>
+
+        <div class="row">
+          <label for="test-message">Write bellow your test message:</label>
+          <textarea
+            id="test-message"
+            style="width: 100%; height: 100px;"
+          ></textarea>
+          <button onclick="sendMessage()">Send test message</button>
+
+          <br />
+
+          <label for="test-command">Write bellow your test command:</label>
+          <textarea
+            id="test-command"
+            style="width: 100%; height: 100px;"
+          ></textarea>
+          <button onclick="sendCommand()">Send test command</button>
+        </div>
+
+        <div class="row">
+          <h1>For authentication type DEV</h1>
+          <p>
+            Enter the name and email of the client (We will create a random
+            identifier and password for them)
+          </p>
+
+          <form>
+            Full Name: <input type="text" id="fullName" /> <br />
+            Email: <input type="text" id="email" /> <br />
+            Id: <input type="text" id="userId" value="testdevuser" /> <br />
+            Password: <input type="text" id="userPass" value="123456" /> <br />
+          </form>
+        </div>
+
+        <div class="row">
+          <h1>For connection data tests (*optional)</h1>
+          <p>
+            Enter with port, hostName and domain informations for BLiP
+            connection
+          </p>
+
+          <form>
+            Domain: <input type="text" id="domain" value="0mn.io" /> <br />
+            HostName: <input type="text" id="hostName" value="hmg-ws.0mn.io" />
+            <br />
+            Port: <input type="text" id="port" value="443" />
+          </form>
+        </div>
+      </div>
     </div>
-  )
-}
+    <div id="sdk-target" style="height:550px; width: 50%"></div>
+
+    <script>
+      var sendMessage
+      var destroyChat
+      var buildChat
+
+      var target
+      var builder
+      ;(function() {
+        window.onload = function() {
+          toogleChat = function() {
+            builder.toogleChat()
+          }
+
+          sendMessage = function() {
+            let msgFieldValue
+            try {
+              msgFieldValue = JSON.parse(
+                document.getElementById('test-message').value
+              )
+            } catch (error) {
+              msgFieldValue = document.getElementById('test-message').value
+            }
+            builder.sendMessage(msgFieldValue)
+          }
+
+          sendCommand = function() {
+            try {
+              const command = JSON.parse(
+                document.getElementById('test-command').value
+              )
+              builder.sendCommand(command)
+            } catch (error) {
+              alert('Comando invalido')
+            }
+          }
+
+          destroyChat = function() {
+            builder.destroy()
+            builder = null
+          }
+
+          buildChat = function(authConfig) {
+            if (builder) {
+              destroyChat()
+            }
+
+            if (authConfig && authConfig.authType == BlipChat.DEV_AUTH) {
+              ;(authConfig.userIdentity = document.getElementById('userId')
+                .value
+                ? document.getElementById('userId').value
+                : '01684334-71c7-40e0-ad1a-5ce372de1a08'), // Required
+                (authConfig.userPassword = document.getElementById('userPass')
+                  .value
+                  ? document.getElementById('userPass').value
+                  : 'MjU2OWNmOTItYmRjZi00Njg0LTljZDktMWQxNjQxYmYxMGU1'), // Required
+                (authConfig.userName = document.getElementById('fullName').value
+                  ? document.getElementById('fullName').value
+                  : ''), // Optional
+                (authConfig.userEmail = document.getElementById('email').value
+                  ? document.getElementById('email').value
+                  : '') // Optional
+            }
+
+            const environment = document.getElementById('environment').value
+              ? document.getElementById('environment').value
+              : 'homolog'
+            const appKey =
+              document.getElementById('app-key').value ||
+              'YmxpcHRlc3RjYXJkczo3YTcwZTUyNi04YzNjLTRmNGQtYWZjYi00ZWFmNzk5ZDFmNjk='
+            const connectionData = {
+              port: document.getElementById('port').value,
+              hostName: document.getElementById('hostName').value,
+              domain: document.getElementById('domain').value
+            }
+
+            const customStyle = `
+            body {
+              background: transparent;
+            }
+            #blip-chat-welcome-container {
+              background-color: transparent;
+            }
+            #blip-chat-welcome-container ~ #message-input {
+              display: none;
+            }
+            #blip-chat-header {
+              display: none;
+            }
+            #app {
+              padding-top: 0;
+              height: 100%;
+              background-color: transparent !important;
+            }
+            .blip-container {
+              margin-bottom: 0;
+            }
+            .blip-card-container, .blip-card .bubble {
+              font-size: 12px;
+            }
+            #message-input {
+              box-sizing: border-box;
+              border: 1px solid #0CC8CC;
+              border-radius: 6px;
+              background: #252B39;
+            }
+            #message-input textarea {
+              background: #252B39;
+              font-size: 12px;
+              color: white;
+            }
+            #message-input .message-options {
+              display: none;
+            }
+          `
+
+            builder = new BlipChat()
+              .withAppKey('dHJhbnNib3JkbzQ1cGVnd3RzcWF5dWhqOXduYm06MWVlODhiNmUtMThlYS00ODlmLWI4MWYtMmI5ZWJhN2UxZjlk')
+            .withButton({"color":"#2CC3D5","icon":"https://blipmediastore.blob.core.windows.net/public-medias/Media_214b44af-a72b-4736-939e-3cf8c62e4332"})
+              .withButton({
+                color: '#2f8413'
+              })
+              .withTarget(target)
+              .withEnvironment(environment)
+              .withConnectionData(connectionData)
+              .withAuth(authConfig)
+              .withAccount({
+                fullName: 'User name',
+                phoneNumber: '+15055034455',
+                email: 'test@test.com',
+                encryptMessageContent: true
+              })
+              .withCustomStyle(customStyle)
+              .withEventHandler(BlipChat.ENTER_EVENT, function() {
+                console.log('enter')
+              })
+              .withEventHandler(BlipChat.LEAVE_EVENT, function() {
+                console.log('leave')
+              })
+              .withEventHandler(BlipChat.LOAD_EVENT, function() {
+                console.log('chat loaded')
+              })
+              .withEventHandler(BlipChat.CREATE_ACCOUNT_EVENT, function() {
+                console.log('account created')
+              })
+              .withCustomMessageMetadata({
+                x: 'y'
+              })
+              .withCustomCommonUrl(
+                'https://yago-luiz-hillesheim-81lzw.chat.blip.ai/'
+              )
+            builder.build()
+          }
+
+          changeSDK = function() {
+            if (target) {
+              target = null
+            } else {
+              target = 'sdk-target'
+            }
+
+            buildChat()
+          }
+
+          applyValues = function() {
+            options.window.title = document.getElementById('title').value
+            options.window.iconPath = document.getElementById('iconPath').value
+            options.window.widgetColor = document.getElementById(
+              'widgetColor'
+            ).value
+            options.window.hideMenu = !document.getElementsByName('hideMenu')[1]
+              .checked
+
+            buildChat(options.config.authType)
+          }
+          buildChat()
+        }
+      })()
+    </script>
+  </body>
+</html>
